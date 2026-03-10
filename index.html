@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pixel Farm</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { background: #7cfc00; text-align: center; font-family: sans-serif; overflow: hidden; }
+        .farm-area { width: 100%; height: 80vh; position: relative; border: 5px solid #5d4037; background: #8bc34a; }
+        .chicken { font-size: 50px; position: absolute; transition: 1s; cursor: pointer; }
+        .stats { background: white; padding: 10px; border-bottom: 3px solid #ccc; }
+    </style>
+</head>
+<body>
+    <div class="stats">🥚 Яєць: <span id="eggs">0</span></div>
+    <div class="farm-area" id="farm">
+        <div class="chicken" id="chick1" style="top: 50px; left: 50px;">🐥</div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand(); // Розгортає на весь екран
+
+        let eggs = 0;
+        const chick = document.getElementById('chick1');
+        const eggCounter = document.getElementById('eggs');
+
+        // Курочка бігає
+        setInterval(() => {
+            chick.style.top = Math.random() * 70 + "%";
+            chick.style.left = Math.random() * 80 + "%";
+        }, 2000);
+
+        // Клік по курці - збираємо яйце
+        chick.onclick = () => {
+            eggs++;
+            eggCounter.innerText = eggs;
+            tg.HapticFeedback.impactOccurred('medium'); // Вібрація телефону
+        };
+    </script>
+</body>
+</html>
