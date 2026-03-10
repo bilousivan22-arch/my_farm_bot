@@ -3,87 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Pixel Farm</title>
+    <title>Super Farm</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #a2d149; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; touch-action: manipulation; }
-        #header { background: #5d4037; color: white; padding: 10px; display: flex; justify-content: space-around; font-weight: bold; }
-        .farm { width: 100vw; height: 80vh; position: relative; }
-        .chicken { font-size: 40px; position: absolute; cursor: pointer; user-select: none; transition: all 0.5s ease; }
-        #shop-btn { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
-                    background: #ff9800; border: none; padding: 15px 30px; border-radius: 25px; 
-                    color: white; font-size: 18px; box-shadow: 0 4px #e68a00; }
-        #shop-btn:active { box-shadow: none; transform: translateX(-50%) translateY(4px); }
+        body { margin: 0; background: #8BC34A; font-family: 'Segoe UI', sans-serif; overflow: hidden; touch-action: manipulation; user-select: none; }
+        
+        /* Верхня панель (Гроші) */
+        #ui-bar { background: rgba(0,0,0,0.6); color: gold; padding: 10px; font-size: 20px; font-weight: bold; text-align: center; border-bottom: 3px solid #333; }
+        
+        /* Будинки по кутках */
+        .house { position: absolute; width: 60px; height: 60px; background: #795548; border: 3px solid #3E2723; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
+        #house-chicken { top: 60px; left: 10px; }
+        #house-goat { top: 60px; right: 10px; }
+        #house-cow { bottom: 100px; left: 10px; }
+        #house-dog { bottom: 100px; right: 10px; background: #607D8B; }
+
+        /* Головне поле */
+        #pasture { position: absolute; top: 130px; left: 50%; transform: translateX(-50%); width: 70vw; height: 50vh; background: #7CB342; border: 4px dashed #558B2F; border-radius: 20px; position: relative; }
+        
+        /* Тварини */
+        .animal { position: absolute; font-size: 35px; transition: 1s ease-in-out; }
+        
+        /* Ведмідь */
+        #bear { display: none; position: absolute; font-size: 70px; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; cursor: crosshair; filter: drop-shadow(0 0 10px red); }
+        #bear-hp-bar { position: absolute; top: -10px; left: 0; width: 100%; height: 5px; background: red; }
+        
+        /* Кнопка магазину */
+        #shop-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #FF9800; border: 3px solid #E65100; color: white; padding: 15px 40px; border-radius: 30px; font-size: 20px; font-weight: bold; }
+        
+        /* Меню магазину */
+        #shop-modal { display: none; position: absolute; top: 10%; left: 10%; width: 80%; background: white; border-radius: 15px; border: 4px solid #333; z-index: 200; padding: 15px; box-sizing: border-box; text-align: center; }
+        .shop-item { background: #eee; margin: 10px 0; padding: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .buy-btn { background: #4CAF50; border: none; padding: 10px 15px; color: white; border-radius: 5px; font-weight: bold; }
+        .buy-btn:active { background: #388E3C; }
+        #close-shop { background: #F44336; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <div id="header">
-        <span>🥚 Яєць: <span id="egg-count">0</span></span>
-        <span>🐥 Курей: <span id="chick-count">1</span></span>
-    </div>
+    <div id="ui-bar">💰 Монети: <span id="coins">10</span></div>
 
-    <div class="farm" id="farm">
-        <div class="chicken" id="c1" onclick="collectEgg(this)">🐥</div>
-    </div>
+    <div class="house" id="house-chicken">🛖</div>
+    <div class="house" id="house-goat">🏡</div>
+    <div class="house" id="house-cow">🏠</div>
+    <div class="house" id="house-dog">🦴</div>
 
-    <button id="shop-btn" onclick="buyChicken()">Купити курку (10 🥚)</button>
+    <div id="pasture"></div>
+
+    <div id="bear" onclick="hitBear()">🐻<div id="bear-hp-bar"></div></div>
+
+    <button id="shop-btn" onclick="openShop()">🛒 Магазин</button>
+
+    <div id="shop-modal">
+        <h2>Магазин Тварин</h2>
+        <div class="shop-item">🐥 Курка (10 💰) <br> <small>1 монета / 3 сек</small> <button class="buy-btn" onclick="buy('chicken', 10)">Купити</button></div>
+        <div class="shop-item">🐐 Коза (50 💰) <br> <small>3 монети / 5 сек</small> <button class="buy-btn" onclick="buy('goat', 50)">Купити</button></div>
+        <div class="shop-item">🐄 Корова (150 💰) <br> <small>10 монет / 8 сек</small> <button class="buy-btn" onclick="buy('cow', 150)">Купити</button></div>
+        <div class="shop-item">🐕 Пес (200 💰) <br> <small>Кусає ведмедя</small> <button class="buy-btn" onclick="buy('dog', 200)">Купити</button></div>
+        <button class="buy-btn" id="close-shop" onclick="closeShop()">Закрити</button>
+    </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        let eggs = 0;
-        let chickens = 1;
+        let coins = 10;
+        let animals = { chicken: 1, goat: 0, cow: 0, dog: 0 };
+        const emojis = { chicken: '🐥', goat: '🐐', cow: '🐄', dog: '🐕' };
+        
+        let bearActive = false;
+        let bearHP = 10;
+        let bearTimer;
 
-        // Функція збору яєць
-        function collectEgg(element) {
-            eggs++;
-            document.getElementById('egg-count').innerText = eggs;
+        // Оновлення UI
+        function updateUI() { document.getElementById('coins').innerText = coins; }
+
+        // Додавання тварини на поле
+        function spawnAnimal(type) {
+            const el = document.createElement('div');
+            el.className = 'animal ' + type;
+            el.innerText = emojis[type];
+            el.style.left = Math.random() * 80 + '%';
+            el.style.top = Math.random() * 80 + '%';
+            document.getElementById('pasture').appendChild(el);
             
-            // Ефект "стрибка" при кліку
-            element.style.transform = "scale(1.3)";
-            setTimeout(() => element.style.transform = "scale(1)", 100);
-            
-            tg.HapticFeedback.impactOccurred('light');
+            // Рух тварини
+            setInterval(() => {
+                if(el) {
+                    el.style.left = Math.random() * 80 + '%';
+                    el.style.top = Math.random() * 80 + '%';
+                }
+            }, 3000 + Math.random() * 2000);
         }
 
-        // Функція купівлі нової курки
-        function buyChicken() {
-            if (eggs >= 10) {
-                eggs -= 10;
-                chickens++;
-                document.getElementById('egg-count').innerText = eggs;
-                document.getElementById('chick-count').innerText = chickens;
-                
-                createChicken();
+        // Початкова курка
+        spawnAnimal('chicken');
+
+        // Магазин
+        function openShop() { document.getElementById('shop-modal').style.display = 'block'; }
+        function closeShop() { document.getElementById('shop-modal').style.display = 'none'; }
+
+        function buy(type, price) {
+            if (coins >= price) {
+                coins -= price;
+                animals[type]++;
+                spawnAnimal(type);
+                updateUI();
+                tg.HapticFeedback.impactOccurred('medium');
             } else {
-                tg.showAlert("Тобі треба 10 яєць!");
+                tg.showAlert("Не вистачає монет!");
             }
         }
 
-        // Створення візуальної курки
-        function createChicken() {
-            const chick = document.createElement('div');
-            chick.className = 'chicken';
-            chick.innerText = '🐥';
-            chick.style.left = Math.random() * 80 + 'vw';
-            chick.style.top = Math.random() * 70 + 'vh';
-            chick.onclick = function() { collectEgg(this); };
-            document.getElementById('farm').appendChild(chick);
+        // Дохід з тварин (Конвертація яєць/молока в монети)
+        setInterval(() => { if(animals.chicken > 0) { coins += 1 * animals.chicken; updateUI(); } }, 3000);
+        setInterval(() => { if(animals.goat > 0) { coins += 3 * animals.goat; updateUI(); } }, 5000);
+        setInterval(() => { if(animals.cow > 0) { coins += 10 * animals.cow; updateUI(); } }, 8000);
+
+        // --- ЛОГІКА ВЕДМЕДЯ ---
+        function spawnBear() {
+            if (bearActive) return;
+            bearActive = true;
+            bearHP = 10;
+            document.getElementById('bear').style.display = 'block';
+            document.getElementById('bear-hp-bar').style.width = '100%';
+            tg.HapticFeedback.notificationOccurred('warning');
             
-            moveChicken(chick);
+            // Якщо не вбили за 10 секунд
+            bearTimer = setTimeout(() => {
+                if (bearActive) {
+                    bearEscapes();
+                }
+            }, 10000); // 10 секунд на реакцію
         }
 
-        // Рух курей
-        function moveChicken(el) {
-            setInterval(() => {
-                el.style.left = Math.random() * 80 + 'vw';
-                el.style.top = Math.random() * 70 + 'vh';
-            }, 3000);
+        function hitBear() {
+            if (!bearActive) return;
+            bearHP--;
+            document.getElementById('bear-hp-bar').style.width = (bearHP * 10) + '%';
+            tg.HapticFeedback.impactOccurred('heavy');
+            
+            if (bearHP <= 0) {
+                clearTimeout(bearTimer);
+                bearDies();
+            }
         }
 
-        // Запускаємо рух першої курки
-        moveChicken(document.getElementById('c1'));
+        function bearDies() {
+            bearActive = false;
+            document.getElementById('bear').style.display = 'none';
+            coins += 50; // Нагорода
+            updateUI();
+            tg.showAlert("Ти вбив ведмедя! +50 монет 💰");
+        }
+
+        function bearEscapes() {
+            bearActive = false;
+            document.getElementById('bear').style.display = 'none';
+            
+            // Краде випадкову тварину
+            let available = [];
+            if(animals.chicken > 0) available.push('chicken');
+            if(animals.goat > 0) available.push('goat');
+            if(animals.cow > 0) available.push('cow');
+            
+            if(available.length > 0) {
+                let stolen = available[Math.floor(Math.random() * available.length)];
+                animals[stolen]--;
+                
+                // Видаляємо одну тварину з екрану
+                let els = document.getElementsByClassName(stolen);
+                if(els.length > 0) els[0].remove();
+                
+                tg.showAlert("Ведмідь втік і вкрав: " + emojis[stolen] + "!");
+            } else {
+                tg.showAlert("Ведмідь прийшов, але красти було нічого...");
+            }
+        }
+
+        // Авто-атака Пса (Кожну секунду знімає 1 HP ведмедю)
+        setInterval(() => {
+            if (bearActive && animals.dog > 0) {
+                bearHP -= animals.dog; // 1 пес = 1 урон в сек
+                document.getElementById('bear-hp-bar').style.width = (bearHP * 10) + '%';
+                if (bearHP <= 0) { clearTimeout(bearTimer); bearDies(); }
+            }
+        }, 1000);
+
+        // Таймер появи ведмедя (Зараз для тесту 30 сек, потім зміни на 300000 для 5 хв)
+        setInterval(spawnBear, 30000); 
+        setTimeout(spawnBear, 15000); // Перший ведмідь прийде швидко для перевірки
+
     </script>
 </body>
 </html>
