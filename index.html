@@ -3,52 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Super Farm Tycoon</title>
+    <title>Farm & Bank Tycoon</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { margin: 0; background: #8BC34A; font-family: 'Segoe UI', sans-serif; overflow: hidden; touch-action: manipulation; user-select: none; }
-        #ui-bar { background: rgba(0,0,0,0.7); color: gold; padding: 12px; font-size: 22px; font-weight: bold; text-align: center; border-bottom: 3px solid #222; }
-        .house { position: absolute; width: 65px; height: 65px; background: #795548; border: 3px solid #3E2723; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 35px; box-shadow: 0 4px rgba(0,0,0,0.3); }
-        #house-chicken { top: 70px; left: 15px; }
-        #house-goat { top: 70px; right: 15px; }
-        #house-cow { bottom: 110px; left: 15px; }
-        #house-dog { bottom: 110px; right: 15px; background: #607D8B; }
-        #pasture { position: absolute; top: 140px; left: 50%; transform: translateX(-50%); width: 85vw; height: 55vh; background: #7CB342; border: 4px dashed #558B2F; border-radius: 25px; }
-        .animal { position: absolute; font-size: 38px; transition: 1.5s ease-in-out; z-index: 10; }
-        #bear { display: none; position: absolute; font-size: 85px; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; cursor: pointer; filter: drop-shadow(0 0 15px red); }
-        #bear-hp-bg { position: absolute; top: -15px; left: 0; width: 100%; height: 8px; background: #333; border-radius: 4px; }
-        #bear-hp-fill { height: 100%; background: #ff0000; width: 100%; border-radius: 4px; transition: 0.2s; }
-        #shop-btn { position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); background: #FF9800; border: none; border-bottom: 5px solid #E65100; color: white; padding: 15px 50px; border-radius: 35px; font-size: 22px; font-weight: bold; }
-        #shop-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; background: white; border-radius: 20px; border: 5px solid #3E2723; z-index: 200; padding: 20px; box-sizing: border-box; }
-        .shop-item { background: #f9f9f9; margin: 12px 0; padding: 12px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #ddd; }
-        .buy-btn { background: #4CAF50; border: none; padding: 10px 18px; color: white; border-radius: 8px; font-weight: bold; font-size: 16px; }
-        .buy-btn:active { background: #388E3C; transform: scale(0.95); }
-        #close-shop { background: #F44336; width: 100%; margin-top: 15px; padding: 12px; }
+        #ui-bar { background: rgba(0,0,0,0.8); color: gold; padding: 10px; font-size: 18px; font-weight: bold; text-align: center; display: flex; justify-content: space-around; border-bottom: 2px solid #333; }
+        .house { position: absolute; width: 60px; height: 60px; background: #795548; border: 3px solid #3E2723; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 4px rgba(0,0,0,0.3); z-index: 5; }
+        #house-chicken { top: 60px; left: 10px; }
+        #house-goat { top: 60px; right: 10px; }
+        #house-cow { bottom: 100px; left: 10px; }
+        #house-bank { bottom: 100px; right: 10px; background: #FFD700; border-color: #B8860B; cursor: pointer; }
+        
+        #pasture { position: absolute; top: 130px; left: 50%; transform: translateX(-50%); width: 80vw; height: 50vh; background: #7CB342; border: 4px dashed #558B2F; border-radius: 20px; }
+        .animal { position: absolute; font-size: 35px; transition: 2s ease-in-out; }
+        
+        #bear { display: none; position: absolute; font-size: 80px; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; cursor: pointer; filter: drop-shadow(0 0 15px red); }
+        #bear-hp { width: 100%; height: 10px; background: red; border: 2px solid black; position: absolute; top: -10px; }
+
+        #btns-row { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 10px; }
+        .action-btn { background: #FF9800; border: none; border-bottom: 4px solid #E65100; color: white; padding: 12px 20px; border-radius: 20px; font-size: 16px; font-weight: bold; }
+        
+        /* Вікна (Модалки) */
+        .modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; background: white; border-radius: 20px; border: 5px solid #333; z-index: 200; padding: 20px; box-sizing: border-box; text-align: center; }
+        .shop-item { background: #f1f1f1; margin: 8px 0; padding: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .buy-btn { background: #4CAF50; border: none; padding: 8px 12px; color: white; border-radius: 5px; }
     </style>
 </head>
 <body>
-    <div id="ui-bar">💰 Монети: <span id="coins">10</span></div>
+    <div id="ui-bar">
+        <span>💰: <span id="coins">10</span></span>
+        <span>🏦: <span id="bank-val">0</span></span>
+    </div>
 
     <div class="house" id="house-chicken">🛖</div>
     <div class="house" id="house-goat">🏡</div>
     <div class="house" id="house-cow">🏠</div>
-    <div class="house" id="house-dog">🦴</div>
+    <div class="house" id="house-bank" onclick="openBank()">🏛️</div>
 
     <div id="pasture"></div>
 
-    <div id="bear" onclick="hitBear()">🐻
-        <div id="bear-hp-bg"><div id="bear-hp-fill"></div></div>
+    <div id="bear" onclick="hitBear()">🐻<div id="bear-hp"></div></div>
+
+    <div id="btns-row">
+        <button class="action-btn" onclick="openShop()">🛒 Магазин</button>
+        <button class="action-btn" style="background:#2196F3; border-color:#1976D2" onclick="openBank()">🏦 Банк</button>
     </div>
 
-    <button id="shop-btn" onclick="openShop()">🛒 МАГАЗИН</button>
+    <div id="shop-modal" class="modal">
+        <h3>Магазин</h3>
+        <div class="shop-item">🐥 Курка (10)<button class="buy-btn" onclick="buy('chicken', 10)">Купити</button></div>
+        <div class="shop-item">🐐 Коза (17)<button class="buy-btn" onclick="buy('goat', 17)">Купити</button></div>
+        <div class="shop-item">🐄 Корова (50)<button class="buy-btn" onclick="buy('cow', 50)">Купити</button></div>
+        <div class="shop-item">🐕 Пес (67)<button class="buy-btn" onclick="buy('dog', 67)">Купити</button></div>
+        <button onclick="closeModals()" style="margin-top:10px">Закрити</button>
+    </div>
 
-    <div id="shop-modal">
-        <h2 style="margin-top:0">🏪 Лавка фермера</h2>
-        <div class="shop-item">🐥 Курка (10 💰)<button class="buy-btn" onclick="buy('chicken', 10)">Купити</button></div>
-        <div class="shop-item">🐐 Коза (17 💰)<button class="buy-btn" onclick="buy('goat', 17)">Купити</button></div>
-        <div class="shop-item">🐄 Корова (50 💰)<button class="buy-btn" onclick="buy('cow', 50)">Купити</button></div>
-        <div class="shop-item">🐕 Пес (67 💰)<button class="buy-btn" onclick="buy('dog', 67)">Купити</button></div>
-        <button class="buy-btn" id="close-shop" onclick="closeShop()">НАЗАД</button>
+    <div id="bank-modal" class="modal">
+        <h3>🏛️ Центральний Банк</h3>
+        <p>Депозит під 20% / хв</p>
+        <h4 id="bank-status">У банку: 0 💰</h4>
+        <button class="buy-btn" onclick="deposit(10)">Покласти 10 💰</button>
+        <button class="buy-btn" style="background:#FF9800" onclick="withdraw()">Зняти все</button>
+        <br><br>
+        <button onclick="closeModals()">Закрити</button>
     </div>
 
     <script>
@@ -56,100 +73,75 @@
         tg.expand();
 
         let coins = 10;
+        let bankDeposit = 0;
         let animals = { chicken: 1, goat: 0, cow: 0, dog: 0 };
         const emojis = { chicken: '🐥', goat: '🐐', cow: '🐄', dog: '🐕' };
-        
-        let bearActive = false;
-        let bearHP = 10;
-        let bearTimer;
+        let bearActive = false, bearHP = 10;
 
-        function updateUI() { document.getElementById('coins').innerText = Math.floor(coins); }
+        function updateUI() {
+            document.getElementById('coins').innerText = Math.floor(coins);
+            document.getElementById('bank-val').innerText = Math.floor(bankDeposit);
+            document.getElementById('bank-status').innerText = "У банку: " + Math.floor(bankDeposit) + " 💰";
+        }
 
         function spawnAnimal(type) {
             const el = document.createElement('div');
-            el.className = 'animal ' + type;
+            el.className = 'animal';
             el.innerText = emojis[type];
-            el.style.left = Math.random() * 80 + '%';
-            el.style.top = Math.random() * 80 + '%';
+            el.style.left = Math.random()*80+'%'; el.style.top = Math.random()*80+'%';
             document.getElementById('pasture').appendChild(el);
-            setInterval(() => { if(el) { el.style.left = Math.random() * 80 + '%'; el.style.top = Math.random() * 80 + '%'; } }, 3500);
+            setInterval(() => { el.style.left = Math.random()*80+'%'; el.style.top = Math.random()*80+'%'; }, 4000);
         }
-
         spawnAnimal('chicken');
 
-        function openShop() { document.getElementById('shop-modal').style.display = 'block'; }
-        function closeShop() { document.getElementById('shop-modal').style.display = 'none'; }
+        function openShop() { document.getElementById('shop-modal').style.display='block'; }
+        function openBank() { document.getElementById('bank-modal').style.display='block'; }
+        function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
 
         function buy(type, price) {
-            if (coins >= price) {
-                coins -= price;
-                animals[type]++;
-                spawnAnimal(type);
-                updateUI();
-                tg.HapticFeedback.impactOccurred('medium');
-            } else { tg.showAlert("Мало грошей! Назбирай ще 🥚"); }
+            if(coins >= price) { coins -= price; animals[type]++; spawnAnimal(type); updateUI(); }
+            else { tg.showAlert("Мало грошей!"); }
         }
 
-        // Авто-виробництво
-        setInterval(() => { coins += 1 * animals.chicken; updateUI(); }, 3000);
-        setInterval(() => { coins += 3 * animals.goat; updateUI(); }, 5000);
-        setInterval(() => { coins += 10 * animals.cow; updateUI(); }, 8000);
-
-        // --- ВЕДМІДЬ (Напад кожні 5 хв) ---
-        function spawnBear() {
-            if (bearActive) return;
-            bearActive = true;
-            bearHP = 10;
-            document.getElementById('bear').style.display = 'block';
-            document.getElementById('bear-hp-fill').style.width = '100%';
-            
-            tg.HapticFeedback.notificationOccurred('error');
-
-            bearTimer = setTimeout(() => { if (bearActive) bearEscapes(); }, 60000); // Має 1 хвилину, щоб вбити
+        // БАНКІВСЬКА ЛОГІКА
+        function deposit(amount) {
+            if(coins >= amount) { coins -= amount; bankDeposit += amount; updateUI(); }
+            else { tg.showAlert("У тебе немає 10 монет!"); }
         }
-
-        function hitBear() {
-            if (!bearActive) return;
-            bearHP--;
-            document.getElementById('bear-hp-fill').style.width = (bearHP * 10) + '%';
-            tg.HapticFeedback.impactOccurred('heavy');
-            if (bearHP <= 0) { clearTimeout(bearTimer); bearDies(); }
+        function withdraw() {
+            coins += bankDeposit; bankDeposit = 0; updateUI();
         }
-
-        function bearDies() {
-            bearActive = false;
-            document.getElementById('bear').style.display = 'none';
-            coins += 50;
-            updateUI();
-            tg.showAlert("Ведмідь переможений! Громада дає 50 💰");
-        }
-
-        function bearEscapes() {
-            bearActive = false;
-            document.getElementById('bear').style.display = 'none';
-            let types = ['chicken', 'goat', 'cow'];
-            let found = types.find(t => animals[t] > 0);
-            if(found) {
-                animals[found]--;
-                let el = document.getElementsByClassName(found)[0];
-                if(el) el.remove();
-                tg.showAlert("Час вийшов! Ведмідь забрав твою " + emojis[found]);
-            }
-        }
-
-        // Пес допомагає (атака кожну секунду)
+        // Нарахування 20% щохвилини
         setInterval(() => {
-            if (bearActive && animals.dog > 0) {
-                bearHP -= (0.5 * animals.dog); // Кожен пес допомагає
-                document.getElementById('bear-hp-fill').style.width = (bearHP * 10) + '%';
-                if (bearHP <= 0) { clearTimeout(bearTimer); bearDies(); }
+            if(bankDeposit > 0) {
+                bankDeposit *= 1.2;
+                updateUI();
+                tg.HapticFeedback.notificationOccurred('success');
             }
-        }, 1000);
+        }, 60000);
 
-        // ТАЙМЕРИ
-        setTimeout(spawnBear, 20000); // Перший через 20 сек
-        setInterval(spawnBear, 300000); // Потім кожні 5 хв (300 сек)
+        // ВЕДМІДЬ (Щохвилини)
+        function spawnBear() {
+            if(bearActive) return;
+            bearActive = true; bearHP = 10;
+            document.getElementById('bear').style.display = 'block';
+            tg.HapticFeedback.notificationOccurred('warning');
+            setTimeout(() => { if(bearActive) bearEscapes(); }, 20000); // 20 сек на вбивство
+        }
+        function hitBear() {
+            bearHP--; 
+            if(bearHP <= 0) { bearActive = false; document.getElementById('bear').style.display='none'; coins+=50; updateUI(); tg.showAlert("Вбив! +50 💰"); }
+        }
+        function bearEscapes() {
+            bearActive = false; document.getElementById('bear').style.display='none';
+            tg.showAlert("Ведмідь втік!");
+        }
 
+        setInterval(() => { coins += 1*animals.chicken + 3*animals.goat + 10*animals.cow; updateUI(); }, 3000);
+        setInterval(spawnBear, 60000); // Кожну хвилину
+        setTimeout(spawnBear, 15000); // Перший через 15 сек
+
+        updateUI();
     </script>
 </body>
 </html>
