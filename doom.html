@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DOOM Telegram</title>
+    <style>
+        body { margin: 0; background: black; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        #dosbox { width: 100%; height: 100%; }
+        .loading { font-family: monospace; font-size: 20px; }
+    </style>
+    <script src="https://js-dos.com/v7/build/releases/latest/js-dos.js"></script>
+</head>
+<body>
+    <div id="dosbox"></div>
+    <script>
+        // Запуск DOOM через JS-DOS
+        Dos(document.getElementById("dosbox"), {
+            style: "hidden"
+        }).run("https://js-dos.com/cdn/doom.zip");
+    </script>
+</body>
+</html>
